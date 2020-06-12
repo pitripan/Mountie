@@ -1,0 +1,7 @@
+- Addon-Descriptions ändern DE/EN
+- englische Lokalisierung
+- Ordnerstruktur aufräumen
+
+
+- GetRandomMount -> Optionen für Mounttyp nochmal prüfen u. ggfs. verfeinern
+- Makros für Schwimm-, Boden-, Flugtiere trennen

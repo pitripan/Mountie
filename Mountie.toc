@@ -1,0 +1,22 @@
+## Interface: 80300
+## Title: Mountie
+## Version: 0.0.1
+## Author: PitriPan
+## Notes: This addon lets you set a mount-up collection for flying, ground and underwater mounts.
+## Notes-deDE: Mit diesem Addon kannst du eine Reittiersammlung für Flug-, Boden- und Unterwasser-Reittiere einrichten.
+## DefaultState: enabled
+## SavedVariables: MountieDB
+## X-Date: 2020-12-30T20:00:00Z
+## X-Website: https://www.curseforge.com/wow/addons/mountie
+## X-License: GNU General Public License v3
+## X-Category: Companions
+## X-Localizations: enUS, deDE
+
+embeds.xml
+locale\enUS.lua
+locale\deDE.lua
+core\colors.lua
+core\defaults.lua
+Mountie.lua
+Mountie.xml
+core\config.lua
