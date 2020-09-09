@@ -6,7 +6,7 @@
 ## Notes-deDE: Mit diesem Addon kannst du eine Reittiersammlung für Flug-, Boden- und Unterwasser-Reittiere einrichten und zufällig eines dieser Reittiere anhand bestimmter Kriterien beschwören.
 ## DefaultState: enabled
 ## SavedVariables: MountieDB
-## X-Date: 2020-09-09T19:00:00Z
+## X-Date: 2020-09-09T21:00:00Z
 ## X-Website: https://www.curseforge.com/wow/addons/mountie
 ## X-License: GNU General Public License v3
 ## X-Category: Companions

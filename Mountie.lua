@@ -622,7 +622,7 @@ function Mountie:OnEnable()
   self.db.char.class = UnitClass("player")
   self.db.char.class2 = select(2, UnitClass("player"))
   self.db.char.faction = UnitFactionGroup("player")
-  self.db.char.hasRidingSkill = IsSpellKnown(33388) or IsSpellKnown(33391)
+  self.db.char.hasRidingSkill = IsSpellKnown(33388) or IsSpellKnown(33391) or IsSpellKnown(34090) or IsSpellKnown(34091) or IsSpellKnown(90265)
   self.db.char.hasFlyingSkill = IsSpellKnown(34090) or IsSpellKnown(34091) or IsSpellKnown(90265)
 
 	local prof1, prof2 = GetProfessions()
