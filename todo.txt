@@ -1,7 +1,13 @@
-- Addon-Descriptions ändern DE/EN
-- englische Lokalisierung
-- Ordnerstruktur aufräumen
+
+TESTEN
+- 
+
+TODO
+- 
 
 
-- GetRandomMount -> Optionen für Mounttyp nochmal prüfen u. ggfs. verfeinern
+NICE TO HAVE
+- Auswahl der Mounts konfigurierbar über Optionen
 - Makros für Schwimm-, Boden-, Flugtiere trennen
+- Hotkey für Mountie direkt einrichten (https://wow.gamepedia.com/Creating_key_bindings)
+- OnScreen Benachrichtigung, falls kein Mount gefunden wurde

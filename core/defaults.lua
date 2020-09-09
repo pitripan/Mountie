@@ -4,7 +4,7 @@
 local _defaultConfig = {
   profile = {
     minimapButton = {
-      hide = false,
+      hide = true,
       lock = false,
       minimapPos = 0,
     },
@@ -17,9 +17,11 @@ local _defaultConfig = {
     level = level,
     race = race,
     class = class,
-  faction = faction,
-  prof = {},
-  classmounts = true,
+    faction = faction,
+    hasRidingSkill = hasRidingSkill,
+    hasFlyingSkill = hasFlyingSkill,
+    prof = {},
+    classmounts = true,
     mounts = {
       ground = {},
       flying = {},

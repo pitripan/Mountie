@@ -11,7 +11,7 @@ local LDB = LibStub("LibDataBroker-1.1"):NewDataObject("Mountie", {
   end,
   OnClick = function(self, button)
     if button == "LeftButton" then
-      -- Mountie:ToggleMainFrame()
+      Mountie:ShowHelpFrame()
     elseif button == "RightButton" then
       Mountie:ShowOptionsFrame()
     end
@@ -20,17 +20,6 @@ local MountieMiniMapButton = LibStub("LibDBIcon-1.0")
 --
 local _Colors = Mountie_GetColors()
 local _defaultConfig = Mountie_GetDefaultConfig()
-
-
-
---[[
-ToDo-List:
-  - /help command für Ausgabe der möglichen Befehle implementieren
-
-ToCome / Ideos List:
-  - 
-]]
-
 
 
 --------------------------------------------------
@@ -102,43 +91,31 @@ end
 --------------------------------------------------
 -- General Functions
 --------------------------------------------------
-local function addMountToSummonList(spellLink)
-  for spellIdStr in string.gmatch(spellLink, "spell:(%d+)") do
-    local spellId = tonumber(spellIdStr)
-    local mountId = Mountie:GetMountIdBySpellId(spellId)
+local function addMountToSummonList(spellId)
+  local mountId = Mountie:GetMountIdBySpellId(spellId)
 
-    if panTableContains(Mountie.db.profile.config.summonList, mountId) == false then
-      Mountie.db.profile.config.summonList[#Mountie.db.profile.config.summonList + 1] = mountId
+  if panTableContains(Mountie.db.profile.config.summonList, mountId) == false then
+    Mountie.db.profile.config.summonList[#Mountie.db.profile.config.summonList + 1] = mountId
 
-      Mountie:RescanMounts()
+    Mountie:RescanMounts()
 
-      local creatureName = C_MountJournal.GetMountInfoByID(mountId)
-      Mountie:Print(string.format(L["Mountie_SummonList_Add"], creatureName))
-    end
+    local creatureName = C_MountJournal.GetMountInfoByID(mountId)
+    --Mountie:Print(string.format(L["Mountie_SummonList_Add"], creatureName))
   end
 end
 
-local function removeMountToSummonList(spellLink)
-  for spellIdStr in string.gmatch(spellLink, "spell:(%d+)") do
-    local spellId = tonumber(spellIdStr)
-    local mountId = Mountie:GetMountIdBySpellId(spellId)
+local function removeMountToSummonList(spellId)
+  local mountId = Mountie:GetMountIdBySpellId(spellId)
 
-    if panTableContains(Mountie.db.profile.config.summonList, mountId) == true then
-      panRemoveFromArray(Mountie.db.profile.config.summonList, mountId)
+  if panTableContains(Mountie.db.profile.config.summonList, mountId) == true then
+    panRemoveFromArray(Mountie.db.profile.config.summonList, mountId)
 
-      Mountie:RescanMounts()
+    Mountie:RescanMounts()
 
-      local creatureName = C_MountJournal.GetMountInfoByID(mountId)
-      Mountie:Print(string.format(L["Mountie_SummonList_Remove"], creatureName))
-    end          
+
+    local creatureName = C_MountJournal.GetMountInfoByID(mountId)
+    --Mountie:Print(string.format(L["Mountie_SummonList_Remove"], creatureName))
   end
-end
-
-local function showHelp()
-  Mountie:Print(L["Mountie_Help"])
-  Mountie:Print(L["Mountie_Help_Default"])
-  Mountie:Print(L["Mountie_Help_Toggle"])
-  Mountie:Print(L["Mountie_Help_Minimap"])
 end
 
 function Mountie_SetupPopupDialogs()
@@ -148,10 +125,10 @@ function Mountie_SetupPopupDialogs()
     button1 = L["Mountie_Yes"],
     button2 = L["Mountie_No"],
     OnAccept = function()
-    ReloadUI()
+      ReloadUI()
     end,
     OnCancel = function()
-    Mountie:Print(L["Mountie_NotReloaded"])
+      Mountie:Print(L["Mountie_NotReloaded"])
     end,
     timeout = 0,
     whileDead = false,
@@ -164,36 +141,6 @@ end
 --------------------------------------------------
 -- Interface Events & Functions
 --------------------------------------------------
-function Mountie_Button_OnEnter(self, motion)
-  if self then
-    GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-    GameTooltip:SetText(L[self:GetName() .. "_Tooltip"])
-    GameTooltip:Show()
-  end
-end
-  
-function Mountie_IconButton_OnEnter(self, motion)
-  if self then
-    GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-    GameTooltip:SetText(L[self:GetName()])
-    GameTooltip:AddLine(L[self:GetName().."_Tooltip"], 1, 1, 1, true)
-    GameTooltip:Show()
-  end
-end
-
-function Mountie_ItemIgnoreButton_OnEnter(self, motion)
-  -- if self then
-  --     GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
-  --     GameTooltip:SetText(L["Mountie_IgnoreItemButton"])
-  --     GameTooltip:AddLine(L["Mountie_IgnoreItemButton_Desc"], 1, 1, 1, true)
-  --     GameTooltip:Show()
-  -- end
-end
-
-function Mountie_Button_OnLeave(self, motion)
-  GameTooltip:Hide()
-end
-
 function Mountie_ShowTooltip(self, title, description)
   if self then
     GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT")
@@ -210,22 +157,23 @@ end
 function Mountie:ExtendMountJournal()
   self.companionButtons = {}
 
-	local numMounts = C_MountJournal.GetNumMounts()
+	local numMounts = C_MountJournal.GetNumDisplayedMounts() --C_MountJournal.GetNumMounts()
 	local scrollFrame = MountJournal.ListScrollFrame
 	local buttons = scrollFrame.buttons
 
 	-- build out check buttons
-	for idx = 1, #buttons do
-		local parent = buttons[idx];
-		if idx <= numMounts then
-			local button = CreateFrame("CheckButton", "MountieCheckButton" .. idx, parent, "UICheckButtonTemplate")
+	for i = 1, #buttons do
+    local parent = buttons[i];
+  
+		if i <= numMounts then
+			local button = CreateFrame("CheckButton", "MountieCheckButton" .. i, parent, "UICheckButtonTemplate")
 			button:SetEnabled(false)
 			button:SetPoint("TOPRIGHT", 0, 0)
 			button:HookScript("OnClick", function(self)
 				Mountie:MountCheckButton_OnClick(self)
 			end)
 
-			self.companionButtons[idx] = button
+			self.companionButtons[i] = button
 		end
 	end
 
@@ -237,8 +185,8 @@ function Mountie:ExtendMountJournal()
 		Mountie:MountJournalScrollFrameUpdate()
 	end)
 	
-	---- hook up events to update check state on search or filter change
-	hooksecurefunc("MountJournal_UpdateMountList", function(self)
+  ---- hook up events to update check state on search or filter change
+  hooksecurefunc("MountJournal_UpdateMountList", function(self)
 		Mountie:MountJournalScrollFrameUpdate()
 	end);
 
@@ -252,30 +200,36 @@ function Mountie:MountJournalScrollFrameUpdate()
 	
 		for idx, button in ipairs(self.companionButtons) do
 			local parent = button:GetParent()
-			
-			-- Get information about the currently selected mount
-			local spellID = parent.spellID
-			local id = self:FindSelectedMount(spellID)
-			local _, _, _, _, _, _, _, isFactionSpecific, faction, _, isCollected = C_MountJournal.GetMountInfoByID(id)
-			local correctFaction = (not isFactionSpecific or (self.db.char.faction == "Horde" and faction == 0) or (self.db.char.faction == "Alliance" and faction == 1))
-			
-			if correctFaction == true and isCollected == true and parent:IsEnabled() == true then					
-				-- Set the checked state based on the currently saved value
-				local checked = false;
-				for mountType, typeTable in pairs(self.db.char.mounts) do
-					if typeTable[spellID] ~= nil then
-						checked = typeTable[spellID]
-					end
-				end
+      
+      if parent.spellID == 0 then
+        _G["MountieCheckButton" .. idx]:Hide()
+      else 
+        _G["MountieCheckButton" .. idx]:Show()
 
-				button:SetEnabled(true)
-				button:SetChecked(checked)
-				button:SetAlpha(1.0);
-			else
-				button:SetEnabled(false)
-				button:SetChecked(false)
-				button:SetAlpha(0.25);
-			end
+        -- Get information about the currently selected mount
+        local spellID = parent.spellID
+        local id = self:FindSelectedMount(spellID)    
+        local _, _, _, _, _, _, _, isFactionSpecific, faction, _, isCollected, _ = C_MountJournal.GetMountInfoByID(id)
+        local correctFaction = (not isFactionSpecific or (self.db.char.faction == "Horde" and faction == 0) or (self.db.char.faction == "Alliance" and faction == 1) or (self.db.char.faction == "Allianz" and faction == 1))
+        
+        if correctFaction == true and isCollected == true and parent:IsEnabled() == true then					
+          -- Set the checked state based on the currently saved value
+          local checked = false;
+          for mountType, typeTable in pairs(self.db.char.mounts) do
+            if typeTable[spellID] ~= nil then
+              checked = typeTable[spellID]
+            end
+          end
+
+          button:SetEnabled(true)
+          button:SetChecked(checked)
+          button:SetAlpha(1.0);
+        else
+          button:SetEnabled(false)
+          button:SetChecked(false)
+          button:SetAlpha(0.25);
+        end
+      end    
 		end
 	end
 end
@@ -283,10 +237,16 @@ end
 --------------------------------------------------
 -- Functions
 --------------------------------------------------
+function Mountie:ShowHelpFrame()
+  -- double call to open the correct interface options panel -> Blizzard needs to fix
+  InterfaceOptionsFrame_OpenToCategory(Mountie.helpFrame)
+  InterfaceOptionsFrame_OpenToCategory(Mountie.helpFrame)
+end
+
 function Mountie:ShowOptionsFrame()
-  -- double call to open the correct interface options panel
-  InterfaceOptionsFrame_OpenToCategory(L["Mountie_Title"])
-  InterfaceOptionsFrame_OpenToCategory(L["Mountie_Title"])
+  -- double call to open the correct interface options panel -> Blizzard needs to fix
+  InterfaceOptionsFrame_OpenToCategory(Mountie.optionsFrame)
+  InterfaceOptionsFrame_OpenToCategory(Mountie.optionsFrame)
 end
 
 function Mountie:ToggleMinimapButton()
@@ -411,20 +371,30 @@ end
 function Mountie:GetRandomMount()
 	-- Determine state order for looking for a mount
   local typeList = {}
-  local keyDown = IsModifierKeyDown()
+  local shiftKeyDown = IsShiftKeyDown()
+  
+  -- if Level <20 or summon list is empty, summon chauffeured
+  --if self.db.char.level < minLevel or next(self.db.profile.config.summonList) == nil then
+  if self.db.char.hasRidingSkill == false or next(self.db.profile.config.summonList) == nil then
+    local id = (self.db.char.faction == "Horde") and 678 or 679
+    local chauffeurMount = select(5, C_MountJournal.GetMountInfoByID(id)) and _chauffeured[id]
+    return chauffeurMount
+	end
     
   if _state.zone == 766 then -- in AQ
-    typeList = { "aq", "ground" }
-	elseif _state.isSwimming == true then
-		if _state.isFlyable == true and keyDown then
-			typeList = { "flying" }
-		else
-			typeList = { "water" }
+    typeList = { "aq", "ground", "flying" }
+  elseif _state.isSwimming == true then  
+		if _state.isFlyable == true and self.db.char.hasFlyingSkill and shiftKeyDown then
+			typeList = { "flying", "ground" }
+    elseif shiftKeyDown then
+      typeList = { "ground" }
+    else 
+      typeList = { "water", "flying", "ground" }
 		end        
-	elseif _state.isFlyable == true then
-		typeList = { "flying" }
+	elseif _state.isFlyable == true and self.db.char.hasFlyingSkill then
+		typeList = { "flying", "ground" }
 	else
-		typeList = { "ground" }
+		typeList = { "ground", "flying" }
 	end
     
 	-- Cycle through the type list
@@ -485,13 +455,13 @@ end
 
 function Mountie:FindSelectedMount(selectedSpellID)
 	for _, id in pairs(C_MountJournal.GetMountIDs()) do
-		local _, spellID = C_MountJournal.GetMountInfoByID(id);
+		local _, spellID = C_MountJournal.GetMountInfoByID(id)
 		if spellID == selectedSpellID then
-			return id;
+			return id
 		end
 	end
 
-	return nil;
+	return nil
 end
 
 function Mountie:MountCheckButton_OnClick(button)
@@ -499,26 +469,16 @@ function Mountie:MountCheckButton_OnClick(button)
   local isChecked = button:GetChecked()
 
   if isChecked then
-    local mountId = Mountie:GetMountIdBySpellId(spellId)
-
-    if panTableContains(Mountie.db.profile.config.summonList, mountId) == false then
-      Mountie.db.profile.config.summonList[#Mountie.db.profile.config.summonList + 1] = mountId
-
-      local creatureName = C_MountJournal.GetMountInfoByID(mountId)
-      Mountie:Print(string.format(L["Mountie_SummonList_Add"], creatureName))
-    end
+    addMountToSummonList(spellId)
   else
-    local mountId = Mountie:GetMountIdBySpellId(spellId)
-
-    if panTableContains(Mountie.db.profile.config.summonList, mountId) == true then
-      panRemoveFromArray(Mountie.db.profile.config.summonList, mountId)
-
-      local creatureName = C_MountJournal.GetMountInfoByID(mountId)
-      Mountie:Print(string.format(L["Mountie_SummonList_Remove"], creatureName))
-    end
+    removeMountToSummonList(spellId)
   end
+end
 
-  Mountie:RescanMounts()
+function Mountie:ShowHelp()
+  Mountie:Print(L["Mountie_Help"])
+  Mountie:Print(L["Mountie_Help_Default"])
+  Mountie:Print(L["Mountie_Help_Minimap"])
 end
 
 --------------------------------------------------
@@ -589,7 +549,6 @@ end
 -- Setup Macro
 ------------------------------------------------------------------
 function Mountie:SetupMacro()
-  -- if InCombatLockdown() or _state.inCombat or _state.inPetBattle then return end
   if InCombatLockdown() then
     return
   end
@@ -597,29 +556,9 @@ function Mountie:SetupMacro()
   -- Create base macro for mount selection
   local index = GetMacroIndexByName("Mountie")
   if index == 0 then
-    -- index = CreateMacro("Mountie", 1, "", 1, nil)
     index = CreateMacro("Mountie", "Ability_Mount_NightmareHorse", "/script MountieButton:Click(GetMouseButtonClicked());", nil)
-    Mountie:PrintColored("Macro 'Mountie' created.", _Colors.green.lightgreen)
+    Mountie:PrintColored(L["Mountie_MacroCreated"], _Colors.green.lightgreen)
   end
-    
-	-- if self.db.profile.level < 20 then
-	-- 	local id = (self.db.profile.faction == "Horde") and 678 or 679
-	-- 	_state.mount = select(5, C_MountJournal.GetMountInfoByID(id)) and chauffeured[id]
-	-- else
-	-- 	_state.mount = self:GetRandomMount()
-	-- end
-	
-	-- if _state.mount then
-	-- 	local name, rank, icon = GetSpellInfo(_state.mount)
-		
-	-- 	if self.db.profile.showInChat then
-	-- 		self:Print(string.format("%s |cff20ff20%s|r", L["The next selected mount is"], name))
-	-- 	end
-		
-	-- 	EditMacro(index, "MountieAddonMacro", "Ability_Mount_NightmareHorse", string.format("#showtooltip %s\n/script MountieButton:Click(GetMouseButtonClicked());", name))
-	-- else
-	-- 	self:Print(L["There is no mount available for the current character."])
-    -- end    
 end
 
 
@@ -632,19 +571,11 @@ SlashCmdList.RELOADUI = ReloadUI;
 function Mountie:ChatCommands(msg)
   local msg, msgParam = strsplit(" ", msg, 2)
   
-  if msg == "rescan" then
-    Mountie:RescanMounts()
-  elseif msg == "minimap" then
-    Mountie:ToggleMinimapButton()
-  elseif msg == "add" then
-    addMountToSummonList(msgParam)
-  elseif msg == "remove" then
-    removeMountToSummonList(msgParam)
-  elseif msg == "summonlist" then
-    panShowArray(self.db.profile.config.summonList)     
-  else
-    showHelp()
-  end
+  -- if msg == "minimap" then
+  --   Mountie:ToggleMinimapButton()
+  -- else
+    Mountie:ShowOptionsFrame()
+  -- end
 end
 
 
@@ -666,20 +597,22 @@ function Mountie:OnInitialize()
 
   -- setup profile options
   profileOptions = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-  LibStub("AceConfig-3.0"):RegisterOptionsTable("MountieProfiles", profileOptions)
-  profileSubMenu = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("MountieProfiles", "Profiles", L["Mountie_Title_Short"])
+  LibStub("AceConfig-3.0"):RegisterOptionsTable("Mountie_Profiles", profileOptions)
+  profileSubMenu = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("Mountie_Profiles", L["Mountie_Profiles"], L["Mountie_Title_Short"])
+
+  -- setup help site
+  --LibStub("AceConfig-3.0"):RegisterOptionsTable("Mountie_Help", nil)
+  Mountie_SetupHelpUI();
+  --helpSubMenu = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(self.helpFrame, L["Mountie_Help"], L["Mountie_Title_Short"])
 
   -- register minimap button
   MountieMiniMapButton:Register("Mountie", LDB, self.db.profile.minimapButton)
 
   -- register slash commands
-  self:RegisterChatCommand("mnt", "ChatCommands")
   self:RegisterChatCommand("mountie", "ChatCommands")
 
   -- setup popup dialogs
   Mountie_SetupPopupDialogs()
-
-  self:Print("OnInitialize done.")
 end
 
 function Mountie:OnEnable()
@@ -689,6 +622,9 @@ function Mountie:OnEnable()
   self.db.char.class = UnitClass("player")
   self.db.char.class2 = select(2, UnitClass("player"))
   self.db.char.faction = UnitFactionGroup("player")
+  self.db.char.hasRidingSkill = IsSpellKnown(33388) or IsSpellKnown(33391)
+  self.db.char.hasFlyingSkill = IsSpellKnown(34090) or IsSpellKnown(34091) or IsSpellKnown(90265)
+
 	local prof1, prof2 = GetProfessions()
 	if prof1 ~= nil then
 		local name1, _, rank1 = GetProfessionInfo(prof1)
@@ -701,13 +637,6 @@ function Mountie:OnEnable()
     
   self:SetupMacro();
 
-  -- -- Track the current combat state for summoning
-  -- self:RegisterEvent("PLAYER_REGEN_DISABLED", "UpdateCombatState")
-  -- self:RegisterEvent("PLAYER_REGEN_ENABLED", "UpdateCombatState")
-  -- self:RegisterEvent("PET_BATTLE_OPENING_START", "UpdatePetBattleState")
-  -- self:RegisterEvent("PET_BATTLE_OPENING_DONE", "UpdatePetBattleState")
-  -- self:RegisterEvent("PET_BATTLE_CLOSE", "UpdatePetBattleState")
-  
   -- Track the current zone and player state for summoning restrictions
   self:RegisterEvent("ZONE_CHANGED_NEW_AREA")						-- new world zone
   self:RegisterEvent("ZONE_CHANGED", "UpdateZoneStatus")			-- new sub-zone
@@ -716,12 +645,9 @@ function Mountie:OnEnable()
   
   -- -- Perform an initial scan
   self:RescanMounts()
-  -- self:ScanForRaceClass() --druid form, monk flying, shaman wolf, worgen ability
   self:ZONE_CHANGED_NEW_AREA()
 
   self:RegisterEvent("ADDON_LOADED")
-
-  Mountie:Print("OnEnable done.")
 end
 
 function Mountie:ZONE_CHANGED_NEW_AREA()
