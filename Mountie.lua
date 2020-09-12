@@ -626,7 +626,7 @@ function Mountie:OnEnable()
   self.db.char.hasFlyingSkill = IsSpellKnown(34090) or IsSpellKnown(34091) or IsSpellKnown(90265)
 
 	local prof1, prof2 = GetProfessions()
-	if prof1 ~= nil then
+	if prof1 ~= nil and prof2 ~= nil then
 		local name1, _, rank1 = GetProfessionInfo(prof1)
 		local name2, _, rank2 = GetProfessionInfo(prof2)
 		self.db.char.prof = {

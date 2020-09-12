@@ -3,6 +3,7 @@ TESTEN
 - 
 
 TODO
+- Reload bei Profileingabe weg machen
 - 
 
 
@@ -11,3 +12,5 @@ NICE TO HAVE
 - Makros für Schwimm-, Boden-, Flugtiere trennen
 - Hotkey für Mountie direkt einrichten (https://wow.gamepedia.com/Creating_key_bindings)
 - OnScreen Benachrichtigung, falls kein Mount gefunden wurde
+- Auswahl Target's Mount
+- Eigener Auswahlscreen für Mounts
