@@ -4,7 +4,8 @@ TESTEN
 
 TODO
 - Reload bei Profileingabe weg machen
-- 
+- Icon abblenden, wenn man nicht reiten kann
+- auf Inselexpeditionen wird als "kann fliegen" gewertet -> Inseln extra ausklammern?
 
 
 NICE TO HAVE
