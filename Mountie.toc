@@ -18,5 +18,6 @@ locale\deDE.lua
 core\colors.lua
 core\defaults.lua
 Mountie.lua
+MountieFlyable.lua
 Mountie.xml
 core\config.lua

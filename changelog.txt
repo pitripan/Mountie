@@ -4,13 +4,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 [Added, Changed, Deprecated, Removed, Fixed, Security]
 
 
+## [1.2.0] - 2020-10-18
+### Added
+- added new flyability check based on Phanx's LibFlyable
+### Fixed
+- fixed mount selection in Draenor and Legion
+- fixed an error where not all checkboxes were shown
+
+
 ## [1.1.0] - 2020-10-17
 ### Fixed
 - updated for Patch 9.0.1
 
+
 ## [1.0.1] - 2020-09-12
 ### Fixed
 - error when character has only one profession
+
 
 ## [1.0.0] - 2020-09-09
 ### Added

@@ -157,7 +157,7 @@ end
 function Mountie:ExtendMountJournal()
   self.companionButtons = {}
 
-	local numMounts = C_MountJournal.GetNumDisplayedMounts() --C_MountJournal.GetNumMounts()
+	local numMounts = C_MountJournal.GetNumMounts() --C_MountJournal.GetNumDisplayedMounts()
 	local scrollFrame = MountJournal.ListScrollFrame
 	local buttons = scrollFrame.buttons
 
@@ -395,8 +395,8 @@ function Mountie:GetRandomMount()
 		typeList = { "flying", "ground" }
 	else
 		typeList = { "ground", "flying" }
-	end
-    
+  end
+  
 	-- Cycle through the type list
 	for i, type in pairs(typeList) do
 		-- Make a sublist of any valid mounts of the selected type
@@ -641,7 +641,8 @@ function Mountie:OnEnable()
   self:RegisterEvent("ZONE_CHANGED_NEW_AREA")						-- new world zone
   self:RegisterEvent("ZONE_CHANGED", "UpdateZoneStatus")			-- new sub-zone
   self:RegisterEvent("ZONE_CHANGED_INDOORS", "UpdateZoneStatus")	-- new city sub-zone
-  self:RegisterEvent("SPELL_UPDATE_USABLE", "UpdateZoneStatus")	-- self-explanatory
+  self:RegisterEvent("SPELL_UPDATE_USABLE", "UpdateZoneStatus")	-- This event is fired when a spell becomes "useable" or "unusable".
+  self:RegisterEvent("SPELLS_CHANGED", "UpdateZoneStatus")	-- Fires when spells in the spellbook change in any way.
   
   -- -- Perform an initial scan
   self:RescanMounts()
@@ -667,11 +668,15 @@ function Mountie:UpdateZoneStatus(event)
   
   -- set flying
   local usable, _ = IsUsableSpell(_flightTest)
-  if IsFlyableArea() and usable == true then
+  if MountieIsFlyableArea() and usable == true then
     _state.isFlyable = true
   else
     _state.isFlyable = false
   end
+
+  -- re-check flying and riding skill
+  self.db.char.hasRidingSkill = IsSpellKnown(33388) or IsSpellKnown(33391) or IsSpellKnown(34090) or IsSpellKnown(90265)
+  self.db.char.hasFlyingSkill = IsSpellKnown(34090) or IsSpellKnown(90265)
 end
 
 function Mountie:ADDON_LOADED(event, addon)
