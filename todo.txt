@@ -3,6 +3,7 @@ TESTEN
 - 
 
 TODO
+- Lvl10 Bug mit Chaffeur beheben
 - Reload bei Profileingabe weg machen
 - Icon abblenden, wenn man nicht reiten kann
 

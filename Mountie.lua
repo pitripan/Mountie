@@ -642,7 +642,8 @@ function Mountie:OnEnable()
   self:RegisterEvent("ZONE_CHANGED", "UpdateZoneStatus")			-- new sub-zone
   self:RegisterEvent("ZONE_CHANGED_INDOORS", "UpdateZoneStatus")	-- new city sub-zone
   self:RegisterEvent("SPELL_UPDATE_USABLE", "UpdateZoneStatus")	-- This event is fired when a spell becomes "useable" or "unusable".
-  self:RegisterEvent("SPELLS_CHANGED", "UpdateZoneStatus")	-- Fires when spells in the spellbook change in any way.
+  self:RegisterEvent("SPELLS_CHANGED", "SpellsChangedOrLevelUp")	-- Fires when spells in the spellbook change in any way.
+  self:RegisterEvent("PLAYER_LEVEL_UP", "SpellsChangedOrLevelUp")	-- Fires on level up.
   
   -- -- Perform an initial scan
   self:RescanMounts()
@@ -683,4 +684,9 @@ function Mountie:ADDON_LOADED(event, addon)
 	if (addon == "Blizzard_Collections") then
 		self:ExtendMountJournal()
 	end
+end
+
+function Mountie:SpellsChangedOrLevelUp(event)  
+  self:UpdateZoneStatus(event)
+  self:RescanMounts()
 end

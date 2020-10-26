@@ -4,6 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 [Added, Changed, Deprecated, Removed, Fixed, Security]
 
 
+## [1.2.1] - 2020-10-26
+### Fixed
+- fixed mount selection after learning new riding/flying skills
+
+
 ## [1.2.0] - 2020-10-18
 ### Added
 - added new flyability check based on Phanx's LibFlyable
